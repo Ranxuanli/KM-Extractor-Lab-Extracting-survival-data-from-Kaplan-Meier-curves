@@ -39,21 +39,7 @@ This project is built around that requirement:
 
 That means you can run the website, click the demo button, and take screenshots that clearly prove the site works.
 
-## Statistical note
 
-This website performs an **approximate** reconstruction. A Kaplan–Meier image usually does not reveal:
-
-- the exact censoring pattern
-- the complete risk table
-- the full original event-time data
-
-Therefore:
-
-- the pairwise log-rank test is approximate
-- the Cox hazard ratio is approximate
-- the indirect A–C comparison is approximate
-
-For a course project, that is acceptable as long as you describe it honestly as a proof-of-concept or computational demo.
 
 ## Project structure
 
