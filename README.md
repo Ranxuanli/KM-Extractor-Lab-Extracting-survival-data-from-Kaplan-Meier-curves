@@ -1,8 +1,6 @@
 # KM Extractor Lab — High-score Version for Option 2
 
-This project is a polished website:
-
-> Design a website that uses LLM APIs to extract event times and event indicators from Kaplan–Meier curves, and then computes log-rank test results based on the extracted data. For extra credit, identify biomedical articles comparing treatment A versus B and treatment B versus C, and use your tool to indirectly compare treatment A versus C.
+> I built a Flask-based website that uses a multimodal LLM API to extract two Kaplan–Meier curves from uploaded biomedical figures. The extracted curves are normalized into structured JSON and cached for reproducible demonstration without exposing API credentials. The website then reconstructs approximate pseudo individual patient data from the extracted step functions and computes an approximate log-rank test and Cox proportional-hazards estimate. In addition, the site contains an extra-credit module for indirect comparison, combining reconstructed A–B and B–C evidence to derive an anchored A–C hazard-ratio estimate under Bucher-style assumptions. Because censoring patterns and complete risk tables are not fully recoverable from image data alone, all inferential results are reported as approximate and proof-of-concept.
 
 ## What is included
 
@@ -32,9 +30,6 @@ The extra-credit page supports:
 5. A **manual calculator** where you can type in your own log(HR) and SE values
 6. Reporting text you can reuse in your final write-up
 
-## Why cached mode matters
-
-The course instruction explicitly says **do not upload API keys** and instead demonstrate the site with **cached runs and snapshots**.
 
 This project is built around that requirement:
 
@@ -108,19 +103,5 @@ http://127.0.0.1:5000
 
 This directly satisfies the request for **cached runs and snapshots**.
 
-## Suggested wording for your report
 
-You can adapt the paragraph below:
-
-> We built a Flask-based website that uses a multimodal LLM API to extract two Kaplan–Meier curves from uploaded biomedical figures. The extracted curves are normalized into structured JSON and cached for reproducible demonstration without exposing API credentials. The website then reconstructs approximate pseudo individual patient data from the extracted step functions and computes an approximate log-rank test and Cox proportional-hazards estimate. In addition, the site contains an extra-credit module for indirect comparison, combining reconstructed A–B and B–C evidence to derive an anchored A–C hazard-ratio estimate under Bucher-style assumptions. Because censoring patterns and complete risk tables are not fully recoverable from image data alone, all inferential results are reported as approximate and proof-of-concept.
-
-## How to turn this into an even stronger final submission
-
-If you want to go further, you can extend this code to include:
-
-- OCR of number-at-risk tables under the KM plot
-- explicit extraction of censoring tick marks
-- article metadata fields such as PMID / DOI / journal / year
-- multi-study comparison panels
-- forest-plot rendering for the indirect-comparison module
 
