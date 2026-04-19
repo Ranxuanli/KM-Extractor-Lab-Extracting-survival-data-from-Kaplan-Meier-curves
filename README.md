@@ -19,9 +19,9 @@ The main page supports:
 7. **A cache gallery** showing stored runs and snapshots
 8. **A polished explanation layer** describing workflow, assumptions, and limitations
 
-### Extra-credit page
+### Indirect comparison page
 
-The extra-credit page supports:
+The Indirect comparison page supports:
 
 1. A dedicated **indirect comparison dashboard**
 2. Two cached pairwise demo studies: **A vs B** and **B vs C**
