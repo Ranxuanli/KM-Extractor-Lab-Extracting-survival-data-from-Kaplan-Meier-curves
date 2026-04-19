@@ -1,6 +1,6 @@
 # KM Extractor Lab — High-score Version for Option 2
 
-This project is a polished website for the course option:
+This project is a polished website:
 
 > Design a website that uses LLM APIs to extract event times and event indicators from Kaplan–Meier curves, and then computes log-rank test results based on the extracted data. For extra credit, identify biomedical articles comparing treatment A versus B and treatment B versus C, and use your tool to indirectly compare treatment A versus C.
 
