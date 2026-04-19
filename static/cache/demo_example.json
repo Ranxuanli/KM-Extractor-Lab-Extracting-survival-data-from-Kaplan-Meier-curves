@@ -1,0 +1,104 @@
+{
+  "cache_key": "demo_example",
+  "extraction": {
+    "title": "Demo extraction from cached Kaplan\u2013Meier plot",
+    "x_label": "Months",
+    "y_label": "Survival probability",
+    "source_note": "Illustrative cached demo for the course project website.",
+    "arms": [
+      {
+        "name": "Treatment A",
+        "n_total": 84,
+        "curve_points": [
+          {
+            "time": 0.0,
+            "survival": 1.0
+          },
+          {
+            "time": 2.0,
+            "survival": 0.98
+          },
+          {
+            "time": 4.0,
+            "survival": 0.95
+          },
+          {
+            "time": 6.0,
+            "survival": 0.92
+          },
+          {
+            "time": 8.0,
+            "survival": 0.89
+          },
+          {
+            "time": 10.0,
+            "survival": 0.84
+          },
+          {
+            "time": 12.0,
+            "survival": 0.79
+          },
+          {
+            "time": 14.0,
+            "survival": 0.73
+          }
+        ]
+      },
+      {
+        "name": "Treatment B",
+        "n_total": 82,
+        "curve_points": [
+          {
+            "time": 0.0,
+            "survival": 1.0
+          },
+          {
+            "time": 2.0,
+            "survival": 0.95
+          },
+          {
+            "time": 4.0,
+            "survival": 0.9
+          },
+          {
+            "time": 6.0,
+            "survival": 0.84
+          },
+          {
+            "time": 8.0,
+            "survival": 0.77
+          },
+          {
+            "time": 10.0,
+            "survival": 0.69
+          },
+          {
+            "time": 12.0,
+            "survival": 0.61
+          },
+          {
+            "time": 14.0,
+            "survival": 0.55
+          }
+        ]
+      }
+    ]
+  },
+  "analysis": {
+    "arm1_name": "Treatment A",
+    "arm2_name": "Treatment B",
+    "n1": 84,
+    "n2": 82,
+    "test_statistic": 6.000025658264554,
+    "p_value": 0.014305670381930893,
+    "hr_group1_vs_group0": 0.5273579555509048,
+    "log_hr": -0.639875728470385,
+    "se_log_hr": 0.2657777686232138,
+    "ci_low": 0.3132384420220694,
+    "ci_high": 0.8878425377407412,
+    "events_group1": 23,
+    "events_group0": 37,
+    "note": "Approximate analysis based on pseudo individual patient data reconstructed from extracted Kaplan\u2013Meier step curves. Censoring and exact risk-table information are not fully recoverable from the figure alone."
+  },
+  "plot_relpath": "plots/demo_example.png"
+}

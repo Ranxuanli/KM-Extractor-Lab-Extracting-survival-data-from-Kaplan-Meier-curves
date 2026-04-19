@@ -1,0 +1,43 @@
+{
+  "study_ab_analysis": {
+    "arm1_name": "Treatment A",
+    "arm2_name": "Treatment B",
+    "n1": 120,
+    "n2": 118,
+    "test_statistic": 3.0301340802496957,
+    "p_value": 0.08173126226463918,
+    "hr_group1_vs_group0": 0.6827685962815119,
+    "log_hr": -0.3815992816773742,
+    "se_log_hr": 0.22054193410881912,
+    "ci_low": 0.4431470912554894,
+    "ci_high": 1.0519598690076057,
+    "events_group1": 36,
+    "events_group0": 48,
+    "note": "Approximate analysis based on pseudo individual patient data reconstructed from extracted Kaplan\u2013Meier step curves. Censoring and exact risk-table information are not fully recoverable from the figure alone."
+  },
+  "study_bc_analysis": {
+    "arm1_name": "Treatment B",
+    "arm2_name": "Treatment C",
+    "n1": 132,
+    "n2": 129,
+    "test_statistic": 4.071765384106626,
+    "p_value": 0.04360567862200741,
+    "hr_group1_vs_group0": 0.6899669280362124,
+    "log_hr": -0.3711116129218303,
+    "se_log_hr": 0.18551518458574567,
+    "ci_low": 0.47964228461503977,
+    "ci_high": 0.9925195860615342,
+    "events_group1": 52,
+    "events_group0": 66,
+    "note": "Approximate analysis based on pseudo individual patient data reconstructed from extracted Kaplan\u2013Meier step curves. Censoring and exact risk-table information are not fully recoverable from the figure alone."
+  },
+  "indirect_result": {
+    "log_hr_ac": -0.7527108945992045,
+    "se_log_hr_ac": 0.28819199921639393,
+    "hr_ac": 0.47108775093595173,
+    "ci_low": 0.2677859763940035,
+    "ci_high": 0.8287352163481806,
+    "z_value": -2.611838276724742,
+    "p_value": 0.00900568441418639
+  }
+}

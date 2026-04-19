@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% block title %}KM Extractor Lab · Main workflow{% endblock %}
+{% block content %}
+<section class="hero hero-home">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow">LLM-based Kaplan–Meier Reconstruction Platform</div>
+      <h1>Upload a Kaplan–Meier figure, extract the survival curves, cache the run, and compute an approximate log-rank test.</h1>
+      <p class="lead">This website is designed as a polished course-project submission. It presents a complete methods story: image upload, LLM-based curve extraction, pseudo-IPD reconstruction, pairwise testing, reproducible caching, and a companion page for indirect A–C comparisons through a shared comparator.</p>
+      <div class="hero-actions">
+        <a class="button primary" href="#workflow">Explore the workflow</a>
+        <a class="button secondary" href="{{ url_for('indirect') }}">Explore Indirect Comparison Module</a>
+      </div>
+      <div class="metric-strip">
+        <div class="mini-metric"><strong>2-arm KM</strong><span>upload + extract</span></div>
+        <div class="mini-metric"><strong>Cached JSON</strong><span>reproducible snapshots</span></div>
+        <div class="mini-metric"><strong>Indirect HR</strong><span>Bucher-style comparison</span></div>
+      </div>
+    </div>
+    <div class="glass-card hero-side">
+      <h3>What the TAs can immediately verify</h3>
+      <ul class="check-list">
+        <li>Website runs locally with no hidden setup beyond <code>pip install -r requirements.txt</code>.</li>
+        <li>Cached demo mode works without any API key.</li>
+        <li>The extraction JSON is visible and saved.</li>
+        <li>The site produces a plot, a log-rank result, and a Cox-model hazard-ratio estimate.</li>
+        <li>A dedicated extra-credit page demonstrates an indirect A–C comparison from A–B and B–C evidence.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="workflow">
+  <div class="container">
+    <div class="section-heading">
+      <div class="eyebrow">Workflow</div>
+      <h2>Two ways to run the site</h2>
+      <p>The main page supports both a live extraction path and a safe cached-demo path. For submission screenshots, the cached path is the easiest because it fully complies with the instruction not to upload API keys.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card emphasis-card">
+        <h3>Live extraction</h3>
+        <p>Upload a Kaplan–Meier figure in PNG or JPEG format. If an OpenAI API key is available in the environment, the site sends the image to a multimodal model, requests structured JSON, normalizes the result, then reconstructs pseudo individual patient data and computes approximate survival statistics.</p>
+        <form method="post" enctype="multipart/form-data" class="stack-form">
+          <input type="hidden" name="mode" value="live">
+          <label class="form-label">Upload Kaplan–Meier image</label>
+          <input class="file-input" type="file" name="image" accept=".png,.jpg,.jpeg">
+          <button class="button primary" type="submit">Run live extraction</button>
+        </form>
+      </div>
+
+      <div class="card subtle-card">
+        <h3>Cached demonstration</h3>
+        <p>This mode simulates a complete successful run using pre-saved extraction output. It is ideal for course submission because the pipeline can be demonstrated through screenshots, cached JSON, and stored output plots with zero risk of exposing credentials.</p>
+        <form method="post" class="stack-form">
+          <input type="hidden" name="mode" value="demo">
+          <button class="button secondary" type="submit">Load cached demo run</button>
+        </form>
+        <div class="info-box">
+          <strong>Recommended screenshot sequence:</strong>
+          <ol>
+            <li>Homepage with the polished interface and method description</li>
+            <li>Result section showing the extracted JSON and the test output</li>
+            <li>Extra-credit indirect-comparison page</li>
+            <li>One cached JSON file or the cache gallery shown below</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="grid-3 feature-grid">
+      <div class="card feature-card">
+        <h3>1. Structured extraction</h3>
+        <p>The model is prompted to return a strict JSON object with a title, axis labels, two treatment arms, approximate sample sizes, and a set of monotone step-curve coordinates.</p>
+      </div>
+      <div class="card feature-card">
+        <h3>2. Pseudo-IPD reconstruction</h3>
+        <p>The site converts each KM step function into an approximate event-time table, treating survival drops as events and carrying the remaining subjects forward as censored at the last observed time.</p>
+      </div>
+      <div class="card feature-card">
+        <h3>3. Statistical output</h3>
+        <p>From the reconstructed data, the website computes an approximate log-rank test and a one-covariate Cox proportional hazards model to estimate a pairwise hazard ratio with a 95% confidence interval.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if result %}
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div class="eyebrow">Run result</div>
+      <h2>Analysis output from the current figure</h2>
+      <p>The cards below combine extraction diagnostics, quantitative results, and the exact JSON used for the analysis.</p>
+    </div>
+    <div class="grid-3 metrics-grid">
+      <div class="metric-card">
+        <span class="metric-label">Approximate log-rank statistic</span>
+        <strong>{{ '%.4f'|format(result.analysis.test_statistic) }}</strong>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Approximate p-value</span>
+        <strong>{{ '%.6g'|format(result.analysis.p_value) }}</strong>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Approximate hazard ratio</span>
+        <strong>{{ '%.3f'|format(result.analysis.hr_group1_vs_group0) }}</strong>
+      </div>
+    </div>
+
+    <div class="grid-2 align-start">
+      <div class="card">
+        <h3>Rendered curve extraction</h3>
+        <img class="plot-img" src="{{ result.plot_url }}" alt="Extracted KM plot">
+        <p class="muted">Cache key: <code>{{ result.cache_key }}</code></p>
+        <p>{{ result.analysis.note }}</p>
+      </div>
+      <div class="card">
+        <h3>Pairwise comparison summary</h3>
+        <div class="summary-table">
+          <div><span>Group 1</span><strong>{{ result.analysis.arm1_name }}</strong></div>
+          <div><span>Group 0</span><strong>{{ result.analysis.arm2_name }}</strong></div>
+          <div><span>Sample sizes</span><strong>{{ result.analysis.n1 }} vs {{ result.analysis.n2 }}</strong></div>
+          <div><span>Estimated events</span><strong>{{ result.analysis.events_group1 }} vs {{ result.analysis.events_group0 }}</strong></div>
+          <div><span>HR (group 1 / group 0)</span><strong>{{ '%.3f'|format(result.analysis.hr_group1_vs_group0) }}</strong></div>
+          <div><span>95% CI</span><strong>{{ '%.3f'|format(result.analysis.ci_low) }} to {{ '%.3f'|format(result.analysis.ci_high) }}</strong></div>
+        </div>
+        <div class="curve-summary-list">
+          {% for row in result.curve_summary %}
+          <div class="curve-item">
+            <h4>{{ row.name }}</h4>
+            <p><strong>Approximate n:</strong> {{ row.n_total }}</p>
+            <p><strong>Extracted points:</strong> {{ row.n_points }}</p>
+            <p><strong>Last time point:</strong> {{ row.final_time }}</p>
+            <p><strong>Final survival:</strong> {{ '%.3f'|format(row.final_survival) }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Extracted JSON</h3>
+      <pre class="code-block">{{ result.extraction_pretty }}</pre>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-heading">
+      <div class="eyebrow">Recent cache</div>
+      <h2>Stored runs and snapshots</h2>
+      <p>These cached records help demonstrate reproducibility. Once a figure has been processed, the output can be re-opened without another live call.</p>
+    </div>
+    <div class="cache-grid">
+      {% for item in cache_records %}
+      <div class="card cache-card">
+        <div class="cache-text">
+          <h3>{{ item.title }}</h3>
+          <p><strong>Arms:</strong> {{ item.arm_names }}</p>
+          {% if item.source_note %}<p>{{ item.source_note }}</p>{% endif %}
+          <p class="muted">Key: <code>{{ item.cache_key }}</code></p>
+        </div>
+        {% if item.plot_url %}
+        <img class="cache-thumb" src="{{ item.plot_url }}" alt="Cached plot">
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="card"><p>No cached runs yet. Load the demo once and this gallery will populate automatically.</p></div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div class="eyebrow">Limitations</div>
+      <h2>Why the site reports approximate results</h2>
+      <p>Published Kaplan–Meier figures rarely expose all ingredients required to perfectly reconstruct the original trial data.</p>
+    </div>
+    <div class="grid-3 feature-grid">
+      <div class="card feature-card">
+        <h3>Censoring is only partially visible</h3>
+        <p>Unless censoring ticks and risk tables are explicitly extracted, survival drops cannot be perfectly separated into events versus censoring patterns.</p>
+      </div>
+      <div class="card feature-card">
+        <h3>Digitization is approximate</h3>
+        <p>Even a strong vision model returns an approximation to the original plotted coordinates. Slight inaccuracies accumulate when transformed into pseudo-IPD.</p>
+      </div>
+      <div class="card feature-card">
+        <h3>Use as proof of concept</h3>
+        <p>The output is best presented as a computational methods demonstration for coursework, with clear disclosure that formal inference would require richer underlying data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

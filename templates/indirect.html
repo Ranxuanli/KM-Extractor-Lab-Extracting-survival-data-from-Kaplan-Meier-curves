@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}KM Extractor Lab · Indirect comparison{% endblock %}
+{% block content %}
+<section class="hero hero-indirect">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow">Indirect Treatment Comparison module</div>
+      <h1>Indirectly compare Treatment A versus Treatment C using evidence from A–B and B–C studies.</h1>
+      <p class="lead">This page demonstrates a polished indirect-comparison workflow. For each pairwise study, the website can derive an approximate hazard ratio from reconstructed pseudo survival data. It then combines the two log-hazard ratios through a Bucher-style indirect comparison to obtain an approximate A–C estimate with a confidence interval and p-value.</p>
+    </div>
+    <div class="glass-card hero-side">
+      <h3>Key assumption</h3>
+      <p>The indirect comparison assumes the two studies are sufficiently comparable in terms of population, outcome definition, and follow-up structure for the shared comparator B to serve as a bridge. This is a teaching demonstration, so the website keeps the assumptions explicit rather than hiding them.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div class="eyebrow">Demo studies</div>
+      <h2>Pairwise evidence used in the indirect comparison</h2>
+      <p>The example below uses two cached studies included with the project so the page is fully demonstrable even without any external APIs.</p>
+    </div>
+    <div class="grid-2 align-start">
+      {% for key, study in studies.items() %}
+      <div class="card">
+        <div class="pill-row"><span class="pill">{{ study.comparison_label }}</span><span class="pill ghost">{{ study.population }}</span></div>
+        <h3>{{ study.article_title }}</h3>
+        <p><strong>Experimental arm:</strong> {{ study.experimental_arm_name }}</p>
+        <p><strong>Control arm:</strong> {{ study.control_arm_name }}</p>
+        <div class="summary-table compact">
+          <div><span>Approximate HR</span><strong>{{ '%.3f'|format(study.analysis.hr_group1_vs_group0) }}</strong></div>
+          <div><span>95% CI</span><strong>{{ '%.3f'|format(study.analysis.ci_low) }} to {{ '%.3f'|format(study.analysis.ci_high) }}</strong></div>
+          <div><span>log(HR)</span><strong>{{ '%.4f'|format(study.analysis.log_hr) }}</strong></div>
+          <div><span>SE of log(HR)</span><strong>{{ '%.4f'|format(study.analysis.se_log_hr) }}</strong></div>
+        </div>
+        <details class="details-box">
+          <summary>View extracted curve JSON</summary>
+          <pre class="code-block small">{{ study.extract | tojson(indent=2) }}</pre>
+        </details>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-heading">
+      <div class="eyebrow">Bucher-style result</div>
+      <h2>Approximate indirect estimate for A versus C</h2>
+      <p>The website combines the two pairwise estimates on the log-hazard-ratio scale:</p>
+      <div class="formula-box">
+        <code>log(HR_A:C) = log(HR_A:B) + log(HR_B:C)</code><br>
+        <code>SE[log(HR_A:C)] = sqrt(SE_A:B^2 + SE_B:C^2)</code>
+      </div>
+    </div>
+    <div class="grid-3 metrics-grid">
+      <div class="metric-card"><span class="metric-label">Indirect HR for A vs C</span><strong>{{ '%.3f'|format(indirect.hr_ac) }}</strong></div>
+      <div class="metric-card"><span class="metric-label">95% CI</span><strong>{{ '%.3f'|format(indirect.ci_low) }} to {{ '%.3f'|format(indirect.ci_high) }}</strong></div>
+      <div class="metric-card"><span class="metric-label">Approximate p-value</span><strong>{{ '%.6g'|format(indirect.p_value) }}</strong></div>
+    </div>
+    <div class="card explanation-card">
+      <h3>Interpretation</h3>
+      <p>If the hazard ratio is below 1, Treatment A appears better than Treatment C under the proportional-hazards approximation and under the assumptions required for an anchored indirect comparison. If it is above 1, Treatment C appears better. Because the inputs themselves come from approximate KM-curve reconstructions, the result should be described as exploratory or proof-of-concept.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading">
+      <div class="eyebrow">Manual calculator</div>
+      <h2>Enter your own pairwise estimates</h2>
+      <p>This lets you demonstrate the indirect-comparison mathematics even if you later replace the demo studies with your own extracted articles.</p>
+    </div>
+    <div class="grid-2 align-start">
+      <div class="card">
+        <form method="post" class="stack-form">
+          <div class="grid-2 form-grid">
+            <div>
+              <label class="form-label">log(HR) for A vs B</label>
+              <input class="text-input" type="number" step="any" name="log_hr_ab" value="{{ custom.log_hr_ab if custom else studies.study_ab.analysis.log_hr }}">
+            </div>
+            <div>
+              <label class="form-label">SE for A vs B</label>
+              <input class="text-input" type="number" step="any" name="se_ab" value="{{ custom.se_ab if custom else studies.study_ab.analysis.se_log_hr }}">
+            </div>
+            <div>
+              <label class="form-label">log(HR) for B vs C</label>
+              <input class="text-input" type="number" step="any" name="log_hr_bc" value="{{ custom.log_hr_bc if custom else studies.study_bc.analysis.log_hr }}">
+            </div>
+            <div>
+              <label class="form-label">SE for B vs C</label>
+              <input class="text-input" type="number" step="any" name="se_bc" value="{{ custom.se_bc if custom else studies.study_bc.analysis.se_log_hr }}">
+            </div>
+          </div>
+          <button class="button primary" type="submit">Compute indirect comparison</button>
+        </form>
+      </div>
+      <div class="card">
+        {% if custom %}
+        <h3>Custom result</h3>
+        <div class="summary-table compact">
+          <div><span>Indirect HR (A vs C)</span><strong>{{ '%.3f'|format(custom.result.hr_ac) }}</strong></div>
+          <div><span>95% CI</span><strong>{{ '%.3f'|format(custom.result.ci_low) }} to {{ '%.3f'|format(custom.result.ci_high) }}</strong></div>
+          <div><span>z-value</span><strong>{{ '%.3f'|format(custom.result.z_value) }}</strong></div>
+          <div><span>p-value</span><strong>{{ '%.6g'|format(custom.result.p_value) }}</strong></div>
+        </div>
+        {% else %}
+        <h3>What this panel shows</h3>
+        <p>After you submit the form, the website reports the indirect A–C estimate using the values you entered. This is useful when you already have hazard ratios from published articles and want a clean, polished interface for the extra-credit demonstration.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-heading">
+      <div class="eyebrow">Reporting language</div>
+      <h2>Suggested phrasing for your write-up</h2>
+    </div>
+    <div class="card">
+      <p>In addition to the main pairwise-extraction pipeline, the website includes an extra-credit module for indirect treatment comparison. Two pairwise studies that share a common comparator can be entered or loaded from cached demonstrations. The site reconstructs approximate hazard-ratio inputs from Kaplan–Meier plots, combines them on the log-HR scale, and reports an anchored indirect estimate for A versus C with uncertainty intervals. The interface explicitly documents the comparability assumptions and the approximate nature of the reconstructed survival data.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

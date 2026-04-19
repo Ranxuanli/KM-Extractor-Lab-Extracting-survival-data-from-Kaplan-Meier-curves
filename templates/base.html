@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}KM Extractor Lab{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand" href="{{ url_for('index') }}">
+          <span class="brand-mark">KM</span>
+          <span>
+            <strong>KM Extractor Lab</strong>
+            <small>LLM-assisted survival-analysis website</small>
+          </span>
+        </a>
+        <nav class="nav">
+          <a class="nav-link {% if page == 'home' %}active{% endif %}" href="{{ url_for('index') }}">Main workflow</a>
+          <a class="nav-link {% if page == 'indirect' %}active{% endif %}" href="{{ url_for('indirect') }}">indirect comparison</a>
+        </nav>
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <div class="container flash-stack">
+        {% for msg in messages %}
+          <div class="flash-card">{{ msg }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer">
+      <div class="container footer-grid">
+        <div>
+          <h4>Why this site exists</h4>
+          <p>This project demonstrates how multimodal LLMs can help extract survival information from Kaplan–Meier plots when raw individual-level data are unavailable.</p>
+        </div>
+        <div>
+          <h4>What is cached</h4>
+          <p>Each run stores extraction JSON and a rendered plot so the workflow can be reproduced later without exposing any live API key.</p>
+        </div>
+        <div>
+          <h4>Statistical caution</h4>
+          <p>Pairwise and indirect comparisons shown here are approximate and intended for coursework demonstration, not definitive clinical inference.</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
